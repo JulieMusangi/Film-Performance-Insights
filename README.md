@@ -275,8 +275,15 @@ The median is: 18900000.0
 #Checking the distribution of foreign gross
 sns.histplot(df1['foreign_gross'].dropna(), kde=True)
 plt.title ("Df1 Foreign Gross Distribution")
+plt.savefig('plots/foreign-gross-dstr.png')
 plt.show()
 ```
+![alt text](plots\df3-domestic-gross-dstr.png)
 ```
-![alt text](image.png)
+#Visualizing outliers
+sns.boxplot(x=df1['foreign_gross'])
+plt.title('Df1 Foreign Gross Box Plot')
+plt.savefig('plots/foreign-gross-box-plot.png')
+plt.show()
 ```
+![alt text](plots\foreign-gross-box-plot.png)
