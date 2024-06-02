@@ -1,7 +1,9 @@
 # Film-Performance-Insights
 ## Background
 
-Microsoft has observed that major companies are successfully creating original video content and capitalizing on the growing demand for streaming and theatrical releases. In response, Microsoft aims to establish a new movie studio to enter the competitive film industry. However, as a newcomer to movie production, Microsoft lacks the necessary insights into what types of films are currently thriving at the box office# Objective
+Microsoft has observed that major companies are successfully creating original video content and capitalizing on the growing demand for streaming and theatrical releases. In response, Microsoft aims to establish a new movie studio to enter the competitive film industry. However, as a newcomer to movie production, Microsoft lacks the necessary insights into what types of films are currently thriving at the box office
+
+# Objective
 
 The primary objective of this project is to conduct an exploratory data analysis (EDA) to identify the types of films that are currently performing the best at the box office. This analysis will provide actionable insights to guide Microsoft's new movie studio in making informed decisions about the genres, themes, and characteristics of films they should focus on producing.
 
@@ -63,3 +65,10 @@ The collected data will be used to perform various analyses, including:
 By leveraging this comprehensive data from Box Office Mojo, The Numbers, IMDb, and Rotten Tomatoes, this project aims to provide in-depth insights into the elements that contribute to a movie's success. The findings will be valuable for Microsoft, in understanding the dynamics of the film industry. 
 
 ## Data Loading and Understanding
+``` # Importing the relevant Libraries
+import pandas as pd
+import seaborn as sns
+import sqlite3 as sqlite3
+import matplotlib.pyplot as plt
+%matplotlib inline ```
+
