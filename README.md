@@ -278,7 +278,7 @@ plt.title ("Df1 Foreign Gross Distribution")
 plt.savefig('plots/foreign-gross-dstr.png')
 plt.show()
 ```
-![alt text](plots\df3-domestic-gross-dstr.png)
+![alt text](plots/df3-domestic-gross-dstr.png)
 ```
 #Visualizing outliers
 sns.boxplot(x=df1['foreign_gross'])
@@ -286,4 +286,4 @@ plt.title('Df1 Foreign Gross Box Plot')
 plt.savefig('plots/foreign-gross-box-plot.png')
 plt.show()
 ```
-![alt text](plots\foreign-gross-box-plot.png)
+![alt text](plots/foreign-gross-box-plot.png)
