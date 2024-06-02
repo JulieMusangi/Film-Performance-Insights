@@ -287,3 +287,36 @@ plt.savefig('plots/foreign-gross-box-plot.png')
 plt.show()
 ```
 ![alt text](plots/foreign-gross-box-plot.png)
+```
+#Skewed distribution with presence of outliers, hence impute missing values in the column with the median
+df1['foreign_gross'].fillna(df1['foreign_gross'].median(), inplace=True)
+
+#confirm that the column no longer has missing values 
+df1.isna().sum()
+```
+```
+title              0
+studio             5
+domestic_gross    28
+foreign_gross      0
+year               0
+dtype: int64
+```
+```
+#drop the rows with missing values in the domestic gross and studio columns since they are a small percentage
+
+df1.dropna(subset=['domestic_gross'], inplace=True)
+df1.dropna(subset=['studio'], inplace=True)
+
+# confirm that the null values have been dropped 
+df1.isna().sum()
+```
+```
+title             0
+studio            0
+domestic_gross    0
+foreign_gross     0
+year              0
+dtype: int64
+```
+#### Dealing with Missing Values in df2
