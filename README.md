@@ -65,10 +65,19 @@ The collected data will be used to perform various analyses, including:
 By leveraging this comprehensive data from Box Office Mojo, The Numbers, IMDb, and Rotten Tomatoes, this project aims to provide in-depth insights into the elements that contribute to a movie's success. The findings will be valuable for Microsoft, in understanding the dynamics of the film industry. 
 
 ## Data Loading and Understanding
-``` # Importing the relevant Libraries
-import pandas as pd
+Importing the relevant Libraries
+``` import pandas as pd
 import seaborn as sns
 import sqlite3 as sqlite3
 import matplotlib.pyplot as plt
 %matplotlib inline ```
+
+Load CSV datasets
+``` df1 = pd.read_csv('zippedData/bom.movie_gross.csv')
+df2 = pd.read_csv('zippedData/rt.movie_info.tsv', delimiter='\t')
+df3 = pd.read_csv('zippedData/tn.movie_budgets.csv', index_col=0)
+
+#Connect to the SQL DataBase
+conn = sqlite3.connect('zippedData/im.db') ```
+
 
