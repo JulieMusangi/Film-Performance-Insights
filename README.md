@@ -94,5 +94,189 @@ title	studio	domestic_gross	foreign_gross	year
 0	Toy Story 3	BV	415000000.0	652000000	2010
 1	Alice in Wonderland (2010)	BV	334200000.0	691300000	2010
 ```
+```
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 3387 entries, 0 to 3386
+Data columns (total 5 columns):
+ #   Column          Non-Null Count  Dtype  
+---  ------          --------------  -----  
+ 0   title           3387 non-null   object 
+ 1   studio          3382 non-null   object 
+ 2   domestic_gross  3359 non-null   float64
+ 3   foreign_gross   2037 non-null   object 
+ 4   year            3387 non-null   int64  
+dtypes: float64(1), int64(1), object(3)
+memory usage: 132.4+ KB
+```
+```
+	domestic_gross	year
+count	3.359000e+03	3387.000000
+mean	2.874585e+07	2013.958075
+std	6.698250e+07	2.478141
+min	1.000000e+02	2010.000000
+25%	1.200000e+05	2012.000000
+50%	1.400000e+06	2014.000000
+75%	2.790000e+07	2016.000000
+max	9.367000e+08	2018.000000
+```
+```
+display(df2.head(2)) #Checking the 2 rows of dataframe2
+display(df2.info()) # Obtaining a concise summary of dataframe2
+display(df2.describe()) #descriptive statistics for the numerical columns
+```
+```
+id	synopsis	rating	genre	director	writer	theater_date	dvd_date	currency	box_office	runtime	studio
+0	1	This gritty, fast-paced, and innovative police...	R	Action and Adventure|Classics|Drama	William Friedkin	Ernest Tidyman	Oct 9, 1971	Sep 25, 2001	NaN	NaN	104 minutes	NaN
+1	3	New York City, not-too-distant-future: Eric Pa...	R	Drama|Science Fiction and Fantasy	David Cronenberg	David Cronenberg|Don DeLillo	Aug 17, 2012	Jan 1, 2013	$	600,000	108 minutes	Entertainment One
+```
+```
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 1560 entries, 0 to 1559
+Data columns (total 12 columns):
+ #   Column        Non-Null Count  Dtype 
+---  ------        --------------  ----- 
+ 0   id            1560 non-null   int64 
+ 1   synopsis      1498 non-null   object
+ 2   rating        1557 non-null   object
+ 3   genre         1552 non-null   object
+ 4   director      1361 non-null   object
+ 5   writer        1111 non-null   object
+ 6   theater_date  1201 non-null   object
+ 7   dvd_date      1201 non-null   object
+ 8   currency      340 non-null    object
+ 9   box_office    340 non-null    object
+ 10  runtime       1530 non-null   object
+ 11  studio        494 non-null    object
+dtypes: int64(1), object(11)
+memory usage: 146.4+ KB
+```
+```
+	id
+count	1560.000000
+mean	1007.303846
+std	579.164527
+min	1.000000
+25%	504.750000
+50%	1007.500000
+75%	1503.250000
+max	2000.000000
+```
+```
+display(df3.head(2)) #Checking the 2 rows of dataframe3
+display(df3.info()) # Obtaining a concise summary of dataframe3
+display(df3.describe()) #descriptive statistics for the numerical columns
+```
+```
+release_date	movie	production_budget	domestic_gross	worldwide_gross
+id					
+1	Dec 18, 2009	Avatar	$425,000,000	$760,507,625	$2,776,345,279
+2	May 20, 2011	Pirates of the Caribbean: On Stranger Tides	$410,600,000	$241,063,875	$1,045,663,875
+```
+```
+<class 'pandas.core.frame.DataFrame'>
+Int64Index: 5782 entries, 1 to 82
+Data columns (total 5 columns):
+ #   Column             Non-Null Count  Dtype 
+---  ------             --------------  ----- 
+ 0   release_date       5782 non-null   object
+ 1   movie              5782 non-null   object
+ 2   production_budget  5782 non-null   object
+ 3   domestic_gross     5782 non-null   object
+ 4   worldwide_gross    5782 non-null   object
+dtypes: object(5)
+memory usage: 271.0+ KB
+```
+```
+release_date	movie	production_budget	domestic_gross	worldwide_gross
+count	5782	5782	5782	5782	5782
+unique	2418	5698	509	5164	5356
+top	Dec 31, 2014	Halloween	$20,000,000	$0	$0
+freq	24	3	231	548	367
+```
 
+##### DataFrame1 and DataFrame2 have some missing values which need to be cleaned, while DataFrame3 has no missing values 
 
+## Data Cleaning
+
+#### Checking for Duplicates
+```
+#Checking for duplicates in all the 3 dataframes 
+df1_duplicates = df1.duplicated().sum()
+df2_duplicates = df2.duplicated().sum()
+df3_duplicates = df3.duplicated().sum()
+
+print(df1_duplicates)
+print(df2_duplicates)
+print(df3_duplicates)
+```
+```
+0
+0
+0
+```
+All the three DataFrames do not contain any duplicated rows
+#### Dealing with Missing Values in df1
+```
+print("Count of Outliers per Column in df1")
+display(df1.isna().sum()) #checking number of missing values in df1
+
+print("The proportion of outliers in df1")
+df1_missing_value_percentage = df1.isnull().mean() * 100
+print(df1_missing_value_percentage)
+```
+```
+Count of Outliers per Column in df1
+```
+```
+title                0
+studio               5
+domestic_gross      28
+foreign_gross     1350
+year                 0
+dtype: int64
+```
+```
+The proportion of outliers in df1
+title              0.000000
+studio             0.147623
+domestic_gross     0.826690
+foreign_gross     39.858282
+year               0.000000
+dtype: float64
+```
+
+Although the foreign_gross column has approximately 40% missing values, it will be retained because it is an important part of this analysis. 
+```
+# changing the foreign_gross column data type
+df1['foreign_gross'] = pd.to_numeric(df1['foreign_gross'], errors='coerce')
+
+# checking the summary stats for the column
+display(df1['foreign_gross'].describe())
+
+# Checking the median of the column
+foreign_gross_median = df1['foreign_gross'].median()
+print(f'The median is: {foreign_gross_median}')
+```
+```
+count    2.032000e+03
+mean     7.505704e+07
+std      1.375294e+08
+min      6.000000e+02
+25%      3.775000e+06
+50%      1.890000e+07
+75%      7.505000e+07
+max      9.605000e+08
+Name: foreign_gross, dtype: float64
+```
+```
+The median is: 18900000.0
+```
+```
+#Checking the distribution of foreign gross
+sns.histplot(df1['foreign_gross'].dropna(), kde=True)
+plt.title ("Df1 Foreign Gross Distribution")
+plt.show()
+```
+```
+![alt text](image.png)
+```
