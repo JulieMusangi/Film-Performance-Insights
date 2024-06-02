@@ -83,5 +83,16 @@ df3 = pd.read_csv('zippedData/tn.movie_budgets.csv', index_col=0)
 #Connect to the SQL DataBase
 conn = sqlite3.connect('zippedData/im.db') 
 ```
+```
+#Exploring the CSV data sets
+display(df1.head(2)) #Checking the 2 rows of dataframe1
+display(df1.info()) # Obtaining a concise summary of dataframe1
+display(df1.describe()) #descriptive statistics for the numerical columns
+```
+```
+title	studio	domestic_gross	foreign_gross	year
+0	Toy Story 3	BV	415000000.0	652000000	2010
+1	Alice in Wonderland (2010)	BV	334200000.0	691300000	2010
+```
 
 
