@@ -685,6 +685,8 @@ plt.show()
 ```
 ![alt text](plots/genre-by-frequency.png)
 
+
+
 #### 2. Type of Content
 ```
 #Count of movie ratings 
