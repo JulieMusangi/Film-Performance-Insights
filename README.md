@@ -601,6 +601,347 @@ plt.show()
 ```
 ![alt text](plots/box-office-revenue-by-studio.png)
 
+### Key Takeaways from the Studio Revenue Plot
+From the above graph, the top 5 studios in terms of revenue (foreign and domestic) generated between 2010 and 2018 are BV, Fox, WB, Uni,and Sony. 
+Microsoft would be entering an industry dominated by established giants with significant resources and longstanding relationships in the film industry. Competing against these major studios would require substantial investment and strategic planning.The dominance of these studios indicates specific market dynamics, including audience preferences, distribution networks, and industry trends. Understanding and navigating these dynamics would be crucial for Microsoft to carve out its niche in the market.To compete effectively, Microsoft would need to focus on producing high-quality content that resonates with audiences. This might involve investing in original content creation, securing valuable intellectual properties, or forming partnerships with established filmmakers and production companies. The top studios likely have well-established distribution channels, including theaters, streaming platforms, and international markets. Microsoft would need to develop or partner with distribution channels to ensure widespread access to its content.To stand out in a crowded market, Microsoft might need to innovate and differentiate its offerings. This could involve leveraging its technological expertise to enhance the viewing experience, experimenting with new storytelling formats, or targeting underserved audience segments.Given the competitive landscape, strategic partnerships could be instrumental for Microsoft's success. This might involve collaborations with existing studios, technology companies, or content creators to leverage complementary strengths and resources.
 
+### B. Budget vs. Revenue
+In this section, we investigate the relationship between production budgets and box office returns using the data from DataFrame3. With the insights gained from this section, Microsoft can make informed decisions and develop a strategic approach to entering the market that maximizes its chances of success and sustainability.
+
+```
+#Calculating Total Revenue
+df3['total_revenue'] = df3['domestic_gross'] + df3['worldwide_gross']
+
+# Plotting the production budget vs total revenue scatter plot
+plt.figure(figsize=(10, 6))
+
+plt.scatter(df3['production_budget'], df3['total_revenue'], color='green', label='Total Revenue') # Scatter plot for total revenue
+plt.title('Correlation between Production Budget and Total Revenue')
+plt.xlabel('Production Budget (in $)')
+plt.ylabel('Total Revenue (in $)')
+plt.legend(loc='upper right')
+plt.savefig('plots/budget-total-revenue-correlation.png')
+plt.grid(True)
+```
+![alt text](plots/budget-total-revenue-correlation.png)
+
+### Correlation between Budget and Revenue 
+The scatter plot shows that there is a strong positive correlation between production budgets and box office returns. This implies that higher production budgets generally lead to higher box office returns. While this is true, it also means that films with high production budgets may have higher financial risks, since some films have high production budgets but very low revenue. 
+Based on this scatter plot, Microsoft should consider developing a content investment strategy that aligns with its objectives and resources. This strategy may involve a mix of high-budget productions to compete with major studios, as well as lower-budget projects targeting specific audience segments.
+
+### C. Release Timing
+This section will investigate the impact of release dates on box office performance using the data from DataFrame3.The goal is to determine whether the month of the film release has an impact on the revenue generated
+
+
+```
+#Change the release_date column to datetime and obtain the month
+df3['release_month'] = pd.to_datetime(df3['release_date']).dt.month
+
+# Calculate total revenue per month
+total_revenue_by_month = df3.groupby('release_month')['total_revenue'].sum()
+
+#Map month number to month name for better visualization
+month_names = {1: 'January', 2: 'February', 3: 'March', 4: 'April', 5: 'May', 6: 'June', 7: 'July', 8: 'August', 9: 'September', 10: 'October', 11: 'November', 12: 'December'}
+total_revenue_by_month.index = total_revenue_by_month.index.map(month_names)
+
+# Plot release date per month against total revenue
+plt.figure(figsize=(10, 6))
+total_revenue_by_month.plot(kind='bar', color='magenta')
+plt.title('Total Revenue by Release Month')
+plt.xlabel('Release Month')
+plt.ylabel('Total Revenue ($)')
+plt.grid(axis='y')
+plt.savefig('plots/revenue-by-release-month')
+plt.show()
+```
+![alt text](plots/revenue-by-release-month.png)
+
+### Release Timing vs Revenue Interpretation
+The bar graph above suggests a seasonal trend in revenue based on the release month. There is a steady increase in revenue from January to March which is possibly due to new product releases, promotions, or increased consumer spending after the December holiday season. There is another slightly surge in revenue between May and June which might be attributed to new releases or seasonal factors like summer sales. The slight drop in July could be due to decreased consumer spending as people may be more focused on outdoor activities and vacations during the summer. The drastic decrease from August to October could be because this period coincides with the back-to-school season, where consumers might be spending less on entertainment and more on school-related expenses. Further, the drastic increase in November and December could be attributed to holiday shopping, with consumers purchasing gifts and taking advantage of Black Friday deals and last-minute purchases before the end of the year.
+
+For this reason, Microsoft should strategically time its product releases to coincide with periods of increased consumer spending, such as before major holidays or during peak shopping seasons. They should also consider investing in marketing and promotional activities during peak revenue months to help maximize sales and capitalize on consumer interest. Microsoft could explore diversifying their product offerings to appeal to different market segments and mitigate the impact of seasonal fluctuations in specific product categories. This could be achieved through making film releases that coincide with cultural events or trends that influence consumer spending. For instance, they may consider releasing horror movies around Halloween or romantic comedies around Valentine's Day to align with the themes of these occasions and attract more audience looking for relevant entertainment options
+
+### D.Genre Analysis
+This section will examine which genres are most popular. We will also analyze the distribution of movie ratings (R, NR) to understand the type of content (mature vs. general audience) being produced.
+Further, we will explore runtime trends to examine the average runtime of movies by genre. 
+
+#### 1. Genre Popularity 
+```
+#Determine the total number of genres represented in the dataset df3
+genre_counts = df2['genre'].nunique()
+genre_counts
+```
+```
+294
+```
+```
+#Counting and ploting the top 10 genres 
+top_ten_genres = df2['genre'].str.split('|').explode().value_counts().head(10)
+top_ten_genres.plot(kind='bar', color= 'teal', title='Top 10 Genre Frequency')
+plt.xlabel('Genre')
+plt.ylabel('Genre Count')
+plt.savefig('plots/genre-by-frequency.png')
+plt.show()
+```
+![alt text](plots/genre-by-frequency.png)
+
+#### 2. Type of Content
+```
+#Count of movie ratings 
+movie_ratings = df2['rating'].value_counts()
+movie_ratings
+```
+```
+R        519
+NR       444
+PG       240
+PG-13    235
+G         56
+NC17       1
+Name: rating, dtype: int64
+```
+```
+#Plotting the count of movie ratings 
+movie_ratings.plot(kind='bar', color=['cyan'], title='Distribution of Rated Films')
+plt.xlabel('Rating')
+plt.ylabel('Number of Movies')
+plt.xticks(rotation=0)
+plt.savefig('plots/rated-films.png')
+plt.show()
+```
+![alt text](plots/rated-films.png)
+
+#### 3. Content Type by Genre
+
+```
+# Filtering dataframe to include only rows with one of the top 10 genres
+top_ten_genres_list = df2['genre'].str.split('|').explode().value_counts().head(10).index.tolist()
+filtered_df = df2[df2['genre'].str.split('|').apply(lambda x: any(item in x for item in top_ten_genres_list))]
+
+# Plotting count of movie ratings for each of the top 10 genres
+plt.figure(figsize=(12, 6))
+
+sns.countplot(data=filtered_df, x='genre', hue='rating', palette='plasma', order=top_ten_genres_list)
+plt.title('Distribution of Movie Ratings within Top 10 Genres')
+plt.xlabel('Genre')
+plt.ylabel('Count')
+plt.xticks(rotation=45, ha='right')
+plt.savefig('plots/gen-vs-rated-films.png')
+plt.legend(title='Rating', bbox_to_anchor=(1, 1));
+```
+![alt text](plots/gen-vs-rated-films.png)
+
+#### 4. Average Runtime by Top 10 Genres.
+```
+# Split the genre column into multiple rows
+split_genres = df2['genre'].str.split('|', expand=True).stack().reset_index(level=1, drop=True)
+split_df = df2.drop('genre', axis=1).join(split_genres.rename('genre'))
+
+# Group by individual genres and calculate average runtime
+average_runtime_per_genre = split_df.groupby('genre')['runtime'].mean().reset_index().head(10)
+
+# Rename columns for clarity
+average_runtime_per_genre.columns = ['Genre', 'Average Runtime']
+
+# Visualization
+plt.figure(figsize=(12, 8))
+plt.barh(average_runtime_per_genre['Genre'], average_runtime_per_genre['Average Runtime'], color='indigo')
+plt.xlabel('Average Runtime')
+plt.ylabel('Genre')
+plt.title('Average Runtime per Genre')
+plt.gca().invert_yaxis()
+plt.savefig('plots/runtime-by-genre.png')
+plt.show()
+```
+![alt text](plots/runtime-by-genre.png)
+
+### Deductions from Genre Analysis
+From the first plot, Drama appears to be the most popular genre, followed closely by Comedy, and Action and Adventure. Further, the Distribution of Movie Ratings bar graph shows that films with rated content are the most popular, followed closely by general audience content. Within the popular genres, majority of the films are rated, as seen in the Drama, Comedy, and Horror genres from the third bar graph. Lastly, a closer look at the average runtime within the top 10 genres reveals that most of the films are between 85 and 110 minutes long. Drama, Faith and Spirituality, Action and Adventure, and Art House and International films seem to have the longest runtimes, which might indicate more detailed and complex narratives. Notably, longer average runtimes are highly likely to translate to higher production costs. Therefore, as Microsoft prepares to enter the film production industry, there are several strategic considerations it can drawn from the analysis of genre popularity, rating distribution, and average runtimes.
+
+- Focus on Popular Genres
+Drama, Comedy, and Action and Adventure are the most popular genres. Investing in these genres could provide a solid entry point into the market with a higher chance of audience engagement and success. Microsoft's entry could leverage these popular genres to quickly establish a foothold in the industry.
+
+- Rated Content Dominance
+Films with rated content are the most popular, closely followed by content suitable for general audiences. This suggests a dual strategy; Mainstream Appeal: Producing films that cater to general audiences to attract families and younger viewers, and Adult and Mature Themes: Developing films with mature themes to tap into the larger adult audience market.
+
+- Runtime and Complexity
+Genres like Drama, Faith and Spirituality, Action and Adventure, and Art House and International have longer runtimes, often indicative of more complex and detailed narratives. Therefore, Microsoft should invest in high-quality storytelling and well-developed stories, especially in these genres, while also being prepared for higher production costs associated with these longer, more detailed films. Adequate budgeting and resource allocation will be crucial.
+
+ ### E. Audience and Critic Ratings
+ This section will analyze audience and critic ratings to assess genre prevalence based on audience and critic reviews, and vote count.
+
+ ```
+ #Checking the tables in the DataBase
+tables = ('''
+SELECT name 
+FROM sqlite_master 
+WHERE type = "table";''')
+pd.read_sql (tables, conn)
+```
+```
+	name
+0	movie_basics
+1	directors
+2	known_for
+3	movie_akas
+4	movie_ratings
+5	persons
+6	principals
+7	writers
+```
+```
+#Checking the first 10 columns of the movie_basics table
+movie_basics_query = ('''SELECT * FROM movie_basics;''')
+movie_basics_df = pd.read_sql(movie_basics_query, conn)
+movie_basics_df.head(10)
+```
+```
+movie_id	primary_title	original_title	start_year	runtime_minutes	genres
+0	tt0063540	Sunghursh	Sunghursh	2013	175.0	Action,Crime,Drama
+1	tt0066787	One Day Before the Rainy Season	Ashad Ka Ek Din	2019	114.0	Biography,Drama
+2	tt0069049	The Other Side of the Wind	The Other Side of the Wind	2018	122.0	Drama
+3	tt0069204	Sabse Bada Sukh	Sabse Bada Sukh	2018	NaN	Comedy,Drama
+4	tt0100275	The Wandering Soap Opera	La Telenovela Errante	2017	80.0	Comedy,Drama,Fantasy
+5	tt0111414	A Thin Life	A Thin Life	2018	75.0	Comedy
+6	tt0112502	Bigfoot	Bigfoot	2017	NaN	Horror,Thriller
+7	tt0137204	Joe Finds Grace	Joe Finds Grace	2017	83.0	Adventure,Animation,Comedy
+8	tt0139613	O Silêncio	O Silêncio	2012	NaN	Documentary,History
+9	tt0144449	Nema aviona za Zagreb	Nema aviona za Zagreb	2012	82.0	Biography
+```
+```
+#Checking the movie ratings table
+ratings_query = ('''SELECT * FROM movie_ratings;''')
+movie_ratings_df = pd.read_sql(ratings_query, conn)
+movie_ratings_df.head(10)
+```
+```
+movie_id	averagerating	numvotes
+0	tt10356526	8.3	31
+1	tt10384606	8.9	559
+2	tt1042974	6.4	20
+3	tt1043726	4.2	50352
+4	tt1060240	6.5	21
+5	tt1069246	6.2	326
+6	tt1094666	7.0	1613
+7	tt1130982	6.4	571
+8	tt1156528	7.2	265
+9	tt1161457	4.2	148
+```
+#### Merging the Tables 
+
+```
+#Merging the two tables 
+merged_df = pd.merge(movie_basics_df, movie_ratings_df, on='movie_id', how='inner')
+merged_df.head(10)
+```
+```
+movie_id	primary_title	original_title	start_year	runtime_minutes	genres	averagerating	numvotes
+0	tt0063540	Sunghursh	Sunghursh	2013	175.0	Action,Crime,Drama	7.0	77
+1	tt0066787	One Day Before the Rainy Season	Ashad Ka Ek Din	2019	114.0	Biography,Drama	7.2	43
+2	tt0069049	The Other Side of the Wind	The Other Side of the Wind	2018	122.0	Drama	6.9	4517
+3	tt0069204	Sabse Bada Sukh	Sabse Bada Sukh	2018	NaN	Comedy,Drama	6.1	13
+4	tt0100275	The Wandering Soap Opera	La Telenovela Errante	2017	80.0	Comedy,Drama,Fantasy	6.5	119
+5	tt0112502	Bigfoot	Bigfoot	2017	NaN	Horror,Thriller	4.1	32
+6	tt0137204	Joe Finds Grace	Joe Finds Grace	2017	83.0	Adventure,Animation,Comedy	8.1	263
+7	tt0146592	Pál Adrienn	Pál Adrienn	2010	136.0	Drama	6.8	451
+8	tt0154039	So Much for Justice!	Oda az igazság	2010	100.0	History	4.6	64
+9	tt0159369	Cooper and Hemingway: The True Gen	Cooper and Hemingway: The True Gen	2013	180.0	Documentary	7.6	53
+```
+#### 1. Investigating Average Ratings by Genre
+
+```
+# Split the genres and explode the DataFrame
+exploded_df = merged_df.assign(genres=merged_df['genres'].str.split(',')).explode('genres')
+
+# Calculate average ratings by genre
+avg_ratings_by_genre = exploded_df.groupby('genres')['averagerating'].mean().reset_index().sort_values(by='averagerating', ascending=False)
+top_ten_avg_ratings_by_genre = avg_ratings_by_genre.head(10)
+
+# Display the average ratings by genre
+print("\nTop Ten Average Ratings by Genre:")
+print(top_ten_avg_ratings_by_genre)
+```
+```
+Top Ten Average Ratings by Genre:
+         genres  averagerating
+21        Short       8.800000
+7   Documentary       7.332090
+11    Game-Show       7.300000
+17         News       7.271330
+4     Biography       7.162274
+14        Music       7.091972
+12      History       7.040956
+22        Sport       6.961493
+24          War       6.584291
+18   Reality-TV       6.500000
+```
+```
+# Visualization: Inverted bar graph for top 10 genres by ratings
+plt.figure(figsize=(10, 6))
+plt.barh(top_ten_avg_ratings_by_genre['genres'], top_ten_avg_ratings_by_genre['averagerating'], color='violet')
+plt.xlabel('Average Rating')
+plt.ylabel('Genre')
+plt.title('Top 10 Genres by Average Rating')
+plt.gca().invert_yaxis()  # Invert y-axis to have the highest rating at the top
+plt.savefig('plots/genres-by-avg-rating.png')
+plt.show()
+```
+![alt text](plots/genres-by-avg-rating.png)
+
+#### 2. Investigating Average Number of Votes by Genre
+```
+# Calculate average number of votes by genre
+avg_votes_by_genre = exploded_df.groupby('genres')['numvotes'].mean().reset_index().sort_values(by='numvotes', ascending=False)
+top10_avg_votes_by_genre = avg_votes_by_genre.head(10)
+top10_avg_votes_by_genre
+# Display the average number of votes by genre
+print("\nTop 10 Average Number of Votes by Genre:")
+print(top10_avg_votes_by_genre)
+```
+```
+Top 10 Average Number of Votes by Genre:
+       genres      numvotes
+2   Adventure  22067.746660
+20     Sci-Fi  19474.292384
+0      Action  14476.485690
+10    Fantasy  12387.443086
+3   Animation   8808.549627
+25    Western   8758.485714
+6       Crime   8594.959011
+16    Mystery   8113.618295
+23   Thriller   5860.449434
+4   Biography   5673.259648
+```
+```
+# Visualization: Inverted bar graph for top 10 genres by number of votes
+plt.figure(figsize=(10, 6))
+plt.barh(top10_avg_votes_by_genre['genres'], top10_avg_votes_by_genre['numvotes'], color='teal')
+plt.xlabel('Number of Votes')
+plt.ylabel('Genre')
+plt.title('Top 10 Genres by Number of Votes')
+plt.gca().invert_yaxis()  # Invert y-axis to have the highest rating at the top
+plt.savefig('plots/genres-by-num-votes.png')
+plt.show()
+```
+![alt text](plots/genres-by-num-votes.png)
+
+```
+#closing the database
+conn.close()
+```
+
+#### Key Insights 
+Both plots highlight the genres that are not only highly rated but also have a significant number of votes, indicating strong audience engagement. This is crucial for identifying genres that are both critically acclaimed and popular among viewers.From the first plot, we see that genres such as Short films, Documentaries, and Game shows have the highest average ratings. These genres are likely to be well-received by critics.The second plot shows that while some genres have high ratings, others also have a substantial number of votes. For instance, Adventure, Sci-Fi, and Action have the highest vote counts respectively. This indicates that these genres are not only liked by critics but are also popular among a broad audience base. For this reason, Microsoft should consider producing films in genres that have high average ratings. These genres are likely to receive positive critical reviews, which can enhance the brand's reputation in the film industry. Furthermore, these genres have demonstrated significant audience engagement, which is crucial for box office success and streaming popularity. Ensuring high audience engagement can lead to better word-of-mouth promotion and sustained viewership.While focusing on high-rated and popular genres, Microsoft should also consider maintaining a diverse portfolio. This strategy can help in reaching different segments of the audience and mitigating the risk associated with focusing on a few genres.
+
+## Recommendations 
+- Prioritize International Markets: To maximize revenue, Microsoft should focus on producing films with broad international appeal. This involves selecting themes, genres, and stories that resonate globally. Microsoft should invest heavily in localization efforts, including dubbing and subtitling, to cater to various linguistic and cultural markets. A diverse film portfolio is essential, mixing blockbusters with niche films tailored to specific audiences. Robust marketing campaigns should be implemented, leveraging digital marketing, social media, and influencer partnerships to reach both domestic and international viewers effectively. Additionally, Microsoft must establish strong global distribution networks to ensure their films are widely accessible.
+
+- Strategic Entry and Differentiation in a Competitive Market: To successfully enter the film industry dominated by established giants, Microsoft should focus on strategic investment and planning. Microsoft must prioritize producing high-quality, original content that resonates with audiences, by potentially securing valuable intellectual properties or forming partnerships with established filmmakers and production companies. Further, Microsoft.should leverage its technological expertise to enhance the viewing experience, innovate with new storytelling formats, and target underserved audience segments to stand out in the market. 
+
+- Strategic Investment in Film Production: The correlation between production budgets and box office returns indicates the need for a nuanced investment strategy. Microsoft should balance high-budget productions to compete with major studios with lower-budget projects targeting specific audience segments. This approach mitigates financial risks while maximizing revenue potential. Aligning investment with objectives and resources ensures a strategic and sustainable presence in the film industry.
+
+- Strategic Release Timing: Microsoft should strategically time its product releases to coincide with periods of increased consumer spending, such as before major holidays or during peak shopping seasons. They should also consider investing in marketing and promotional activities during peak revenue months to help maximize sales and capitalize on consumer interest. Microsoft could explore diversifying their product offerings to appeal to different market segments and mitigate the impact of seasonal fluctuations in specific product categories. This could be achieved through making film releases that coincide with cultural events or trends that influence consumer spending. For instance, they may consider releasing horror movies around Halloween or romantic comedies around Valentine's Day to align with the themes of these occasions and attract more audience looking for relevant entertainment options
+
+- Genre Focus Strategy, Diversified Content Approach, and Investment in Narrative Complexity: Microsoft should strategically focus its initial film productions on popular genres such as Drama, Comedy, and Action and Adventure. These genres exhibit high audience engagement and offer a favorable market entry point. Secondly, recognizing the dominance of rated content, Microsoft should adopt a diversified content strategy catering to both general audiences and mature viewers. This entails producing family-friendly films with broad appeal while also developing content featuring mature themes to capture the adult demographic.Given the correlation between genre runtime and narrative complexity, Microsoft should prioritize investments in storytelling quality and narrative depth, particularly within genres like Drama, Faith and Spirituality, Action and Adventure, and Art House and International. Emphasizing well-developed characters, intricate plots, and thematic depth can elevate the artistic merit of Microsoft's film productions and distinguish them in the marketplace. While longer runtimes may entail higher production costs, the potential for critical acclaim and audience resonance justifies the investment.
 
 
