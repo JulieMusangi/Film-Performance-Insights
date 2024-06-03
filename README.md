@@ -1,4 +1,4 @@
-# Film-Performance-Insights
+# Microsoft Film Performance Insights 
 ## Background
 
 Microsoft has observed that major companies are successfully creating original video content and capitalizing on the growing demand for streaming and theatrical releases. In response, Microsoft aims to establish a new movie studio to enter the competitive film industry. However, as a newcomer to movie production, Microsoft lacks the necessary insights into what types of films are currently thriving at the box office
