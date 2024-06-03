@@ -320,3 +320,287 @@ year              0
 dtype: int64
 ```
 #### Dealing with Missing Values in df2
+```
+display(df2.isna().sum()) #checking number of missing values in df2
+
+df2_missing_value_percentage = df2.isnull().mean() * 100
+print(df2_missing_value_percentage)
+```
+```
+id                 0
+synopsis          62
+rating             3
+genre              8
+director         199
+writer           449
+theater_date     359
+dvd_date         359
+currency        1220
+box_office      1220
+runtime           30
+studio          1066
+dtype: int64
+```
+```
+id               0.000000
+synopsis         3.974359
+rating           0.192308
+genre            0.512821
+director        12.756410
+writer          28.782051
+theater_date    23.012821
+dvd_date        23.012821
+currency        78.205128
+box_office      78.205128
+runtime          1.923077
+studio          68.333333
+dtype: float64
+```
+```
+# List of columns to drop, since more than 50% of their data is missing
+columns_to_drop = ['currency', 'box_office', 'studio'] 
+df2.drop(columns=columns_to_drop, inplace=True)
+
+# Display the remaining columns
+print(df2.columns)
+```
+```
+Index(['id', 'synopsis', 'rating', 'genre', 'director', 'writer',
+       'theater_date', 'dvd_date', 'runtime'],
+      dtype='object')
+```
+```
+# Defining a function to remove 'minutes' and convert the runtime column into float
+def remove_minutes(runtime_col):
+    if isinstance(runtime_col, str):
+        return float(runtime_col.replace(' minutes', ''))
+    return runtime_col
+
+# Apply the function to the 'runtime' column
+df2['runtime'] = df2['runtime'].apply(remove_minutes)
+
+print(f'The mean is: {df2["runtime"].mean()}')
+
+print(f'The median is: {df2["runtime"].median()}')
+```
+```
+The mean is: 103.96797385620916
+The median is: 100.0
+```
+```
+# Checking the distribution of runtime 
+sns.histplot(df2['runtime'].dropna(), kde=True)
+plt.title ("Runtime Distribution")
+plt.savefig('plots/runtime-dstr.png')
+plt.show()
+```
+![alt text](plots/runtime-dstr.png)
+```
+#Since the column exhibits a symmetrical distribution, impute the missing values with the mean
+df2['runtime'].fillna(df2['runtime'].mean(), inplace=True)
+
+#confirm that the column no longer has missing values 
+df2.isna().sum()
+```
+```
+id                0
+synopsis         62
+rating            3
+genre             8
+director        199
+writer          449
+theater_date    359
+dvd_date        359
+runtime           0
+dtype: int64
+```
+```
+#Dropping missing values in the synopsis, rating, and genre columns as they account for a small percentage
+df2.dropna(subset= ['synopsis', 'rating' , 'genre'], inplace= True)
+df2.isna().sum()
+```
+```
+id                0
+synopsis          0
+rating            0
+genre             0
+director        174
+writer          398
+theater_date    297
+dvd_date        297
+runtime           0
+dtype: int64
+```
+```
+#writting a custom function to impute the missing values in the remaining columns with the string 'unknown'
+def custom_impute (col_name):
+    return col_name.fillna('Unknown')
+
+#columns to impute
+cols_to_impute = ['director' , 'writer' , 'theater_date', 'dvd_date']
+for col_name in cols_to_impute:
+    df2[col_name] = custom_impute(df2[col_name])
+
+df2.isna().sum()
+```
+```
+id              0
+synopsis        0
+rating          0
+genre           0
+director        0
+writer          0
+theater_date    0
+dvd_date        0
+runtime         0
+dtype: int64
+```
+
+#### Checking for Outliers in the Dataframes
+```
+#Converting the data type for data in production budget, domestic gross, and worldwide gross columns in  df3
+# Remove dollar sign ($) and commas (,) 
+df3['production_budget'] = df3['production_budget'].replace({'\$': '', ',': ''}, regex=True)
+df3['worldwide_gross'] = df3['worldwide_gross'].replace({'\$': '', ',': ''}, regex=True)
+df3['domestic_gross'] = df3['domestic_gross'].replace({'\$': '', ',': ''}, regex=True)
+```
+```
+#convert to numeric in-place
+df3['production_budget'] = pd.to_numeric(df3['production_budget'])
+df3['worldwide_gross'] = pd.to_numeric(df3['worldwide_gross'])
+df3['domestic_gross'] = pd.to_numeric(df3['domestic_gross'])
+```
+#### Visualizing the Distributions
+```
+#Checking the distribution of production budget, worldwide gross, domestic gross
+sns.histplot(df3['domestic_gross'])
+plt.title ("Df3 Domestic Gross Distribution")
+plt.savefig('plots/df3-domestic-gross-dstr.png')
+plt.show()
+
+sns.histplot(df3['production_budget'])
+plt.title ("Df3 Production Budget Distribution")
+plt.savefig('plots/production-budget-dstr.png')
+plt.show()
+
+sns.histplot(df3['worldwide_gross'])
+plt.title ("Df3 Worldwide Gross Distribution")
+plt.savefig('plots/WWide-gross-dstr.png')
+plt.show()
+```
+![alt text](plots/df3-domestic-gross-dstr.png)
+![alt text](plots/production-budget-dstr.png)
+![alt text](plots/WWide-gross-dstr.png)
+
+### Count of Outliers
+```
+# Function to identify the number of outliers using the IQR method and return as a DataFrame
+def find_outliers_iqr(column):
+    Q1 = column.quantile(0.25)
+    Q3 = column.quantile(0.75)
+    IQR = Q3 - Q1
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+    outliers = column[(column < lower_bound) | (column > upper_bound)]
+    outliers_df = pd.DataFrame({'Outlier': outliers})
+    return outliers_df
+
+# Calling the function onto different numeric columns on the three datasets
+df1_domestic_gross_outliers = find_outliers_iqr(df1['domestic_gross'])
+foreign_gross_outliers = find_outliers_iqr(df1['foreign_gross'])
+runtime_outliers = find_outliers_iqr(df2['runtime'])
+production_budget_outliers = find_outliers_iqr(df3['production_budget'])
+worldwide_gross_outliers = find_outliers_iqr(df3['worldwide_gross'])
+df3_domestic_gross_outliers = find_outliers_iqr(df3['domestic_gross'])
+
+# Return the count of outliers in each column
+print(f'Domestic gross outliers: {len(df1_domestic_gross_outliers)}')
+print(f'Foreign gross outliers: {len(foreign_gross_outliers)}')
+print(f'Runtime outliers: {len(runtime_outliers)}')
+print(f'Production budget outliers: {len(production_budget_outliers)}')
+print(f'Worldwide Gross outliers: {len(worldwide_gross_outliers)}')
+print(f'Df3 Domestic Gross outliers: {len(df3_domestic_gross_outliers)}')
+
+```
+```
+Domestic gross outliers: 406
+Foreign gross outliers: 615
+Runtime outliers: 67
+Production budget outliers: 431
+Worldwide Gross outliers: 604
+Df3 Domestic Gross outliers: 463
+```
+```
+#Checking the maximum and minimum values in the columns with outliers
+def calculate_min_max (columns):
+    for column in columns:
+        max_value = column.max()
+        min_value = column.min()
+        print(f'Minimum value in: {column.name} = {min_value} and Maximum value = {max_value} ')
+
+columns = [df1['domestic_gross'], df1['foreign_gross'], df2['runtime'], df3['domestic_gross'], df3['worldwide_gross'], df3['production_budget']]
+
+calculate_min_max(columns)
+```
+```
+Minimum value in: domestic_gross = 100.0 and Maximum value = 936700000.0 
+Minimum value in: foreign_gross = 600.0 and Maximum value = 960500000.0 
+Minimum value in: runtime = 5.0 and Maximum value = 358.0 
+Minimum value in: domestic_gross = 0 and Maximum value = 936662225 
+Minimum value in: worldwide_gross = 0 and Maximum value = 2776345279 
+Minimum value in: production_budget = 1100 and Maximum value = 425000000 
+```
+
+### Descriptive Analysis and Summarization 
+
+### A. Box Office Performance
+In this section, we look at an analysis of the financial success of films over recent years, considering both domestic and international box office revenues data from DataFrame1. 
+We will also explore further to check the total gross per studio, to identify Microsoft's likely-to-be top 10 competitors
+```
+#Plotting the Grouped Bar Chart
+bar_width = 0.35
+plt.figure(figsize=(10, 6))
+plt.bar(df1['year'] - bar_width/2, df1['domestic_gross'], width=bar_width, label='Domestic Gross', color='skyblue')
+plt.bar(df1['year'] + bar_width/2, df1['foreign_gross'], width=bar_width, label='Foreign Gross', color='orange')
+plt.xlabel('Year')
+plt.ylabel('Total Box Office Revenue')
+plt.title('Box Office Performance')
+plt.legend(loc='upper right')
+plt.grid(True)
+plt.xticks(df1['year'])
+plt.savefig('plots/box-office-performance.png')
+plt.show()
+```
+![alt text](plots/box-office-performance.png)
+
+### Key Observations
+In most years shown, the foreign gross (orange bars) tends to be higher than the domestic gross (sky blue bars), indicating that international box office revenue is generally greater than domestic revenue.
+
+Year-to-Year Comparison:
+Between 2011 and 2014, there is a noticeable trend that shows that the foreign gross is significantly higher than the domestic gross. This could be attributed to a global expansion of the film industry, emerging markets, and better marketing strategies witnessed in the early 2010's. However, from 2015 to 2018, the gap between domestic and foreign revenues significantly reduced. This could possibly be attributed to market saturation, increased popularity of streaming services, and a possible improvement in the quality and variety of domestic content.
+Revenue Peaks:
+
+The highest foreign gross is observed in 2011.
+The highest domestic gross is also observed in 2015, indicating that 2015 was a strong year for both domestic and international box office revenues.
+
+### Plotting Revenue per Studio
+```
+# Aggregate total revenue by studio, and obtain the top 10
+df1['total_revenue'] = df1['domestic_gross'] + df1['foreign_gross']
+studio_revenue = df1.groupby('studio')['total_revenue'].sum().reset_index().sort_values(by='total_revenue', ascending=False).head(10)
+
+# Plotting the Bar Chart
+plt.figure(figsize=(10, 6))
+plt.bar(studio_revenue['studio'], studio_revenue['total_revenue'], color='teal')
+plt.xlabel('Studio Name')
+plt.ylabel('Total Box Office Revenue')
+plt.title('Total Box Office Revenue by Studio')
+plt.grid(True)
+plt.savefig('plots/box-office-revenue-by-studio')
+plt.show()
+```
+![alt text](plots/box-office-revenue-by-studio.png)
+
+
+
+
